@@ -1,3 +1,4 @@
+#WinGUILite 🚀
 *A simple GUI for Microsoft WinGet*  
 
 ## 🌟 Overview  
