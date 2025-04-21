@@ -6,12 +6,12 @@ WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to ins
 
 ## 📥 Download & Install  
 1. **Download the latest version** from the [WinGUI Lite GitHub Releases](https://github.com/JimmyPla6z/WinGUILite/releases).  
-2. Run the `WinGUI Lite Setup Wizard.exe` to install.  
-3. Open **WinGUI Lite** and start managing packages effortlessly!  
+2. Download and Open **WinGUI-Lite-1.0.0.exe** and start managing packages effortlessly!  
 
 ## 🛠 Requirements  
 ✔ Windows 10 / 11 
 ✔ WinGet (Usually Comes With Windows)
+✔ Stable Internet Connection
 
 ## ⚡ Features  
 - Graphical Interface for WinGet  
