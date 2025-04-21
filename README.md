@@ -10,10 +10,8 @@ WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to ins
 3. Open **WinGUI Lite** and start managing packages effortlessly!  
 
 ## 🛠 Requirements  
-✔ Windows 10 / 11  
-✔ **Python** (Required to run)  
-
-💡 Don’t have Python installed? Get it [here](https://www.python.org/downloads/).  
+✔ Windows 10 / 11 
+✔ WinGet (Usually Comes With Windows)
 
 ## ⚡ Features  
 - Graphical Interface for WinGet  
