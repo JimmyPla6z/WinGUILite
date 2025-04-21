@@ -9,11 +9,9 @@ WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to ins
 2. Download and Open **WinGUI-Lite-1.0.0.exe** and start managing packages effortlessly!  
 
 ## 🛠 Requirements  
-✔ Windows 10 / 11 
-
-✔ WinGet (Usually Comes With Windows)
-
-✔ Stable Internet Connection
+### ✔ Windows 10 / 11 
+### ✔ WinGet (Usually Comes With Windows)
+### ✔ Stable Internet Connection
 
 ## ⚡ Features  
 - Graphical Interface for WinGet  
