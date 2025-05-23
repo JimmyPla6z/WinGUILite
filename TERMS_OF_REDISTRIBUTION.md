@@ -1,6 +1,6 @@
 # WinGUILite Terms of Redistribution
 
-**Version 1.0 – [Date]**
+**Version 1.0 – May 23 2025**
 
 ## 1. General Policy
 WinGUILite is an open-source project intended to be freely available for all users. Redistribution of this software and its derivatives (forks) must **always** comply with these terms to preserve its free nature.
