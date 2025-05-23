@@ -1,4 +1,4 @@
-# WinGUILite Terms of Redistribution
+# Terms of Redistribution
 
 **Version 1.0 – May 23 2025**
 
