@@ -22,6 +22,14 @@ WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to ins
 2. Search for packages.  
 3. Install, update, or remove them with a **single click**!  
 
-## 🛠 Contributing  
-Want to improve WinGUI Lite? Contributions are welcome!  
-Fork this repo, and create a repository with the forked repo
+## 🛠 Contributing
+
+Want to help improve **WinGUILite**? Contributions are very welcome!
+
+To get started:
+1. **Fork this repository** to your own GitHub account.
+2. **Clone your fork** and create a new branch for your changes.
+3. Make your improvements—code, UI, docs, anything you’d like to contribute.
+4. When you're ready, **submit a pull request** with a brief explanation of what you've done.
+
+Feel free to open an issue if you'd like to propose an idea or get feedback before coding. Let's make WinGUILite better, together!
