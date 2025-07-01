@@ -38,7 +38,7 @@ Your changes will be reviewed, and if everything looks good, they’ll be merged
 - Be respectful in discussions and PR comments
 - Clearly describe your changes and why they’re needed
 - If suggesting an enhancement via an issue, please offer rationale or a mockup if possible
-- More contribution & forking guidelines are in the [TERMS_OF_REDISTRIBUTION.md](https://github.com/JimmyPla6z/WinGUILite/edit/main/TERMS_OF_REDISTRIBUTION.md) 
+- More contribution & forking guidelines are in the [TERMS_OF_REDISTRIBUTION.md](https://github.com/JimmyPla6z/WinGUILite/blob/main/TERMS_OF_REDISTRIBUTION.md) 
 
 ## 🏷️ Labels & Help
 
