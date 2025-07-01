@@ -21,5 +21,3 @@ WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to ins
 1. Open **WinGUI Lite**.  
 2. Search for packages.  
 3. Install, update, or remove them with a **single click**!  
-
-Feel free to open an issue if you'd like to propose an idea or get feedback before coding. Let's make WinGUILite better, together!
