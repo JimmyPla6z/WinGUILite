@@ -4,13 +4,18 @@ import subprocess
 import threading
 import re
 
+# List to store all package IDs
+all_ids = []
+raw = None  # Global variable to store raw details for selected package
+
 def run_command(command):
     """Executes a shell command using PowerShell for winget compatibility."""
     try:
         result = subprocess.run(
             ["powershell", "-Command", command],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8"  # Force utf-8 to avoid UnicodeDecodeError
         )
         return result.stdout.strip()
     except Exception as e:
@@ -28,7 +33,8 @@ def run_command_live(command, output_widget, install_btn, uninstall_btn):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                encoding='utf-8'
+                encoding='utf-8',  # Force utf-8 to avoid UnicodeDecodeError
+                errors='replace'   # Replace unrecognized characters
             )
             output_widget.config(state='normal')
             output_widget.delete('1.0', tk.END)
@@ -90,11 +96,11 @@ def show_detail_screen(package_name, description, package_id):
     detail_frame.pack(fill='both', expand=True)
 
 def on_package_select(event):
+    global raw  # Use global raw to get details from fetch_package_details
     selected = tree_results.selection()
     if not selected:
         return
     name, pkg_id, _ = tree_results.item(selected, 'values')
-    raw = run_command(f"winget show {pkg_id}")
     lines = [l for l in raw.splitlines() if not re.match(r"^Found\s.+\s\[[^\]]*\]$", l)]
 
     desc_lines = []
@@ -114,8 +120,17 @@ def on_package_select(event):
     description = '\n'.join(desc_lines) if desc_lines else 'Description: Not provided by package.'
     show_detail_screen(name, description, pkg_id)
 
+def fetch_package_details():
+    global raw
+    """Fetches details for all found packages (runs in a separate thread after search)."""
+    for programm_id in all_ids:
+        # Here you can store or process the details if you want
+        raw = run_command(f"winget show {programm_id}")
+
 def search_packages():
     query = entry_search.get().strip()
+    query = query.replace(' ', '')  # Remove spaces for correct search
+    print(f"Searching for: {query}")  # Debug print
     if not query:
         messagebox.showwarning("Input Error", "Please enter a search term.")
         return
@@ -124,6 +139,7 @@ def search_packages():
         messagebox.showinfo("No Results", "No packages found for your search.")
         return
     tree_results.delete(*tree_results.get_children())
+    all_ids.clear()  # Clear previous IDs
     header_passed = False
     for line in output.splitlines():
         if re.match(r"^-{5,}", line):
@@ -133,7 +149,11 @@ def search_packages():
             continue
         cols = re.split(r"\s{2,}", line.strip())
         if len(cols) >= 3:
+            all_ids.append(cols[1])  # Store package ID
+            print(f"Found package ID: {all_ids}")  # Debug print for IDs
             tree_results.insert('', 'end', values=(cols[0], cols[1], cols[2]))
+    # Start thread to fetch details for all packages after search
+    threading.Thread(target=fetch_package_details, daemon=True).start()
 
 def install_package(pkg_id):
     run_command_live(f"winget install --id {pkg_id} -e --accept-source-agreements --accept-package-agreements", txt_info, install_btn, uninstall_btn)
