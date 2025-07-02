@@ -15,7 +15,7 @@ def run_command(command):
             ["powershell", "-Command", command],
             capture_output=True,
             text=True,
-            encoding="utf-8"  # Force utf-8 to avoid UnicodeDecodeError
+            encoding="utf-8"
         )
         return result.stdout.strip()
     except Exception as e:
@@ -25,16 +25,15 @@ def run_command_live(command, output_widget, install_btn, uninstall_btn):
     """Executes a command and updates output in the Text widget."""
     def task():
         try:
-            install_btn.config(state='disabled')  # Disable button during installation
-            uninstall_btn.config(state='disabled')  # Disable uninstall button during install
-
+            install_btn.config(state='disabled')
+            uninstall_btn.config(state='disabled')
             process = subprocess.Popen(
                 ["powershell", "-NoProfile", "-Command", f'chcp 65001 >$null; {command}'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                encoding='utf-8',  # Force utf-8 to avoid UnicodeDecodeError
-                errors='replace'   # Replace unrecognized characters
+                encoding='utf-8',
+                errors='replace'
             )
             output_widget.config(state='normal')
             output_widget.delete('1.0', tk.END)
@@ -62,11 +61,9 @@ def run_command_live(command, output_widget, install_btn, uninstall_btn):
                 output_widget.update_idletasks()
 
             output_widget.insert(tk.END, "\nDone.\n")
-            install_btn.config(state='normal')
-            uninstall_btn.config(state='normal')
-            output_widget.config(state='disabled')
         except Exception as e:
             output_widget.insert(tk.END, f"Error: {e}")
+        finally:
             output_widget.config(state='disabled')
             install_btn.config(state='normal')
             uninstall_btn.config(state='normal')
@@ -105,13 +102,14 @@ def on_package_select(event):
     if not raw:
         messagebox.showinfo("Please wait", "Τα στοιχεία ακόμα φορτώνονται…")
         return
+
     lines = [l for l in raw.splitlines() if not re.match(r"^Found\s.+\s\[[^\]]*\]$", l)]
     desc_lines = []
     in_desc = False
     for line in lines:
         if line.strip().startswith('Description:'):
             in_desc = True
-            part = line.split('Description:',1)[1].strip()
+            part = line.split('Description:', 1)[1].strip()
             if part:
                 desc_lines.append(part)
             continue
@@ -120,6 +118,7 @@ def on_package_select(event):
                 desc_lines.append(line.strip())
             else:
                 break
+
     description = '\n'.join(desc_lines) if desc_lines else 'Description: Not provided by package.'
     show_detail_screen(name, description, pkg_id)
 
@@ -129,20 +128,21 @@ def fetch_package_details():
         package_details[programm_id] = run_command(f"winget show {programm_id}")
 
 def search_packages():
-    query = entry_search.get().strip()
-    query = query.replace(' ', '')  # Remove spaces for correct search
-    print(f"Searching for: {query}")  # Debug print
+    query = entry_search.get().strip().replace(' ', '')
     if not query:
         messagebox.showwarning("Input Error", "Please enter a search term.")
         return
+
     output = run_command(f'winget search "{query}"')
     if "No package found" in output or not output.strip():
         messagebox.showinfo("No Results", "No packages found for your search.")
         return
+
     tree_results.delete(*tree_results.get_children())
-    all_ids.clear()  # Clear previous IDs
-    package_details.clear()  # Clear previous details
+    all_ids.clear()
+    package_details.clear()
     header_passed = False
+
     for line in output.splitlines():
         if re.match(r"^-{5,}", line):
             header_passed = True
@@ -151,21 +151,26 @@ def search_packages():
             continue
         cols = re.split(r"\s{2,}", line.strip())
         if len(cols) >= 3:
-            all_ids.append(cols[1])  # Store package ID
-            print(f"Found package ID: {all_ids}")  # Debug print for IDs
+            all_ids.append(cols[1])
             tree_results.insert('', 'end', values=(cols[0], cols[1], cols[2]))
-    # Start thread to fetch details for all packages after search
+
     threading.Thread(target=fetch_package_details, daemon=True).start()
 
 def install_package(pkg_id):
-    run_command_live(f"winget install --id {pkg_id} -e --accept-source-agreements --accept-package-agreements", txt_info, install_btn, uninstall_btn)
+    run_command_live(
+        f"winget install --id {pkg_id} -e --accept-source-agreements --accept-package-agreements",
+        txt_info, install_btn, uninstall_btn
+    )
 
 def uninstall_package(pkg_id):
-    run_command_live(f"winget uninstall --id {pkg_id} -e", txt_info, install_btn, uninstall_btn)
+    run_command_live(
+        f"winget uninstall --id {pkg_id} -e",
+        txt_info, install_btn, uninstall_btn
+    )
 
-# Main Window Setup
+# GUI Setup
 root = tk.Tk()
-root.title("Wingui Lite")  # Updated name here
+root.title("Wingui Lite")
 root.geometry("700x500")
 
 # Search Frame
@@ -176,7 +181,7 @@ search_header = tk.Frame(search_frame, bg='lightgray', height=40)
 search_header.pack(fill='x')
 search_title = tk.Label(
     search_header,
-    text="Wingui Lite - A Lite GUI For Microsoft Winget",  # Updated header name here
+    text="Wingui Lite - A Lite GUI For Microsoft Winget",
     font=('Arial', 14, 'bold'),
     bg='lightgray'
 )
@@ -185,11 +190,7 @@ search_title.pack(side='left', padx=10)
 tk.Label(search_frame, text="Search for a package:").pack(pady=(10, 0))
 entry_search = tk.Entry(search_frame, width=40)
 entry_search.pack(pady=5)
-tk.Button(
-    search_frame,
-    text="Search",
-    command=search_packages
-).pack(pady=5)
+tk.Button(search_frame, text="Search", command=search_packages).pack(pady=5)
 
 cols = ("Name", "ID", "Version")
 tree_results = ttk.Treeview(search_frame, columns=cols, show='headings', height=8)
@@ -201,18 +202,10 @@ tree_results.bind('<<TreeviewSelect>>', on_package_select)
 # Detail Frame
 detail_frame = tk.Frame(root)
 
-btn_back = tk.Button(
-    detail_frame,
-    text="< Back",
-    command=back_to_search
-)
+btn_back = tk.Button(detail_frame, text="< Back", command=back_to_search)
 btn_back.pack(anchor='nw', padx=10, pady=(10, 0))
 
-label_pkg_name = tk.Label(
-    detail_frame,
-    text="",
-    font=('Arial', 16)
-)
+label_pkg_name = tk.Label(detail_frame, text="", font=('Arial', 16))
 label_pkg_name.pack(anchor='nw', padx=10)
 
 install_btn = tk.Button(detail_frame, text="Install")
