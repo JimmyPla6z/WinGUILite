@@ -6,7 +6,7 @@ import re
 
 # List to store all package IDs
 all_ids = []
-raw = None  # Global variable to store raw details for selected package
+package_details = {}  # Store raw details per package ID
 
 def run_command(command):
     """Executes a shell command using PowerShell for winget compatibility."""
@@ -96,13 +96,16 @@ def show_detail_screen(package_name, description, package_id):
     detail_frame.pack(fill='both', expand=True)
 
 def on_package_select(event):
-    global raw  # Use global raw to get details from fetch_package_details
     selected = tree_results.selection()
     if not selected:
         return
-    name, pkg_id, _ = tree_results.item(selected, 'values')
+    item_id = selected[0]
+    name, pkg_id, _ = tree_results.item(item_id, 'values')
+    raw = package_details.get(pkg_id, "")
+    if not raw:
+        messagebox.showinfo("Please wait", "Τα στοιχεία ακόμα φορτώνονται…")
+        return
     lines = [l for l in raw.splitlines() if not re.match(r"^Found\s.+\s\[[^\]]*\]$", l)]
-
     desc_lines = []
     in_desc = False
     for line in lines:
@@ -121,11 +124,9 @@ def on_package_select(event):
     show_detail_screen(name, description, pkg_id)
 
 def fetch_package_details():
-    global raw
     """Fetches details for all found packages (runs in a separate thread after search)."""
     for programm_id in all_ids:
-        # Here you can store or process the details if you want
-        raw = run_command(f"winget show {programm_id}")
+        package_details[programm_id] = run_command(f"winget show {programm_id}")
 
 def search_packages():
     query = entry_search.get().strip()
@@ -140,6 +141,7 @@ def search_packages():
         return
     tree_results.delete(*tree_results.get_children())
     all_ids.clear()  # Clear previous IDs
+    package_details.clear()  # Clear previous details
     header_passed = False
     for line in output.splitlines():
         if re.match(r"^-{5,}", line):

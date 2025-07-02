@@ -103,6 +103,17 @@ def run_command_live(command, output_widget, install_btn, uninstall_btn):
             uninstall_btn.setEnabled(True)
     threading.Thread(target=task, daemon=True).start()  # Run in a new thread
 
+class PackageFetcher(threading.Thread):
+    def __init__(self, ids, dest_dict):
+        super().__init__(daemon=True)
+        self.ids = ids
+        self.dest = dest_dict
+        self.start()
+
+    def run(self):
+        for pkg_id in self.ids:
+            self.dest[pkg_id] = run_command(f"winget show {pkg_id}")
+
 class MainWindow(QWidget):
     """
     Main application window class.
@@ -124,7 +135,8 @@ class MainWindow(QWidget):
         self.setup_detail_screen()  # Setup detail widgets
         self.stacked.addWidget(self.detail_widget)
         self.stacked.setCurrentWidget(self.search_widget)  # Show search screen
-        self.raw_list = []  # List to store details for all found packages
+        # self.raw_list = []  # REMOVE: Not needed anymore
+        self.package_details = {}  # Store package details by ID
 
     def setup_search_screen(self):
         """
@@ -214,13 +226,16 @@ class MainWindow(QWidget):
         Callback when the user selects a package from the list.
         Shows the package details.
         """
-        selected = self.tree_results.selectedItems()  # Selected items in the list
+        selected = self.tree_results.selectedItems()
         if not selected:
             return
-        item = selected[0]  # The first selected item
-        name, pkg_id, _ = [item.text(i) for i in range(3)]  # Name, ID, Version
-        # Filter out irrelevant lines
-        lines = [l for l in win.raw.splitlines() if not re.match(r"^Found\s.+\s\[[^\]]*\]$", l)]
+        item = selected[0]
+        name, pkg_id, _ = [item.text(i) for i in range(3)]
+        raw = self.package_details.get(pkg_id, "")
+        if not raw:
+            QMessageBox.information(self, "Please wait", "Τα στοιχεία ακόμα φορτώνονται…")
+            return
+        lines = [l for l in raw.splitlines() if not re.match(r"^Found\s.+\s\[[^\]]*\]$", l)]
         desc_lines = []
         in_desc = False
         for line in lines:
@@ -243,14 +258,17 @@ class MainWindow(QWidget):
         Fetches details for all found packages (runs in a separate thread after search).
         Used to display details when the user selects a package.
         """
-        for programm_info in all_ids:
-            self.raw_list.append(run_command(f"winget show {programm_info}"))
+        # Not used anymore, replaced by PackageFetcher
+        pass
 
     def search_packages(self):
         """
         Searches for packages based on the search field text.
         Updates the results list.
         """
+        global all_ids
+        all_ids.clear()  # reset!
+        self.package_details = {}  # reset details dict
         query = self.entry_search.text().strip()  # The search text
         query = query.replace(' ', '')  # Remove spaces for correct search
         print(f"Searching for: {query}")  # Debug print
@@ -275,7 +293,7 @@ class MainWindow(QWidget):
                 print(f"Found package ID: {all_ids}")  # Debug print for IDs
                 QTreeWidgetItem(self.tree_results, [cols[0], cols[1], cols[2]])  # Add result
         # Start thread to fetch details for all found packages after search
-        threading.Thread(target=self.fetch_package_details, daemon=True).start()
+        PackageFetcher(all_ids.copy(), self.package_details)
 
     def install_package(self, pkg_id):
         """
