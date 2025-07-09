@@ -5,7 +5,7 @@
 WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to install and manage packages without using the command line.  
 
 ## 📥 Download & Install  
-1. Go to [WinGUILite's official website download page](https://winguilite.github.io).
+1. Go to [WinGUILite's official website download page](https://winguilite.github.io/download).
 2. Choose your prefered WinGUILite edition.
 3. Hit the **Download** button.
 4. **Open the downloaded executable** and start managing packages effortlessly!
