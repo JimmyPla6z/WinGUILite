@@ -1,0 +1,15 @@
+{
+    "VLC Media Player": "VideoLAN.VLC",
+    "Spotify": "Spotify.Spotify",
+    "Audacity": "Audacity.Audacity",
+    "foobar2000": "PeterPawlowski.foobar2000",
+    "iTunes": "Apple.iTunes",
+    "AIMP": "AIMP.AIMP",
+    "PotPlayer": "DAUM.PotPlayer",
+    "Kodi": "XBMCFoundation.Kodi",
+    "OBS Studio ": "OBSProject.OBSStudio",
+    "HandBrake": "HandBrake.HandBrake",
+    "CapCut": "ByteDance.CapCut",
+    "Shotcut": "Meltytech.Shotcut",
+    "Kdenlive": "KDE.kdenlive"
+}
