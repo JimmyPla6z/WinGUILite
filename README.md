@@ -6,8 +6,10 @@ WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to ins
 Now includes a **Multi Installer** for batch installation of popular apps!
 
 ## 📥 Download & Install  
-1. **Download the latest version** from the [WinGUILite GitHub Releases](https://github.com/JimmyPla6z/WinGUILite/releases).  
-2. **Open the executable** and start managing packages effortlessly!  
+1. Go to [WinGUILite's official website download page](https://winguilite.github.io/download).
+2. Choose your prefered WinGUILite edition.
+3. Hit the **Download** button.
+4. **Open the downloaded executable** and start managing packages effortlessly!
 
 ## 🛠 Requirements  
 - Windows 10 / 11  
@@ -31,6 +33,6 @@ Now includes a **Multi Installer** for batch installation of popular apps!
 4. Enjoy easy, fast package management!  
 
 ## 🤝 Contributing  
-Want to improve **WinGUILite**? Contributions are welcome!  
+Want to help improve **WinGUILite**? Contributions are welcome!  
 For detailed steps on how to contribute to **WinGUILite**, please  
 read the [CONTRIBUTING.md](https://github.com/JimmyPla6z/WinGUILite/blob/main/CONTRIBUTING.md)
