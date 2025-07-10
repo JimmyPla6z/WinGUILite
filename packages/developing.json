@@ -1,0 +1,19 @@
+{
+    "Sublime Text": "SublimeHQ.SublimeText.4",
+    "Atom": "GitHub.Atom",
+    "Vim": "vim.vim",
+    "Emacs": "GNU.Emacs",
+    "JetBrains PyCharm": "JetBrains.PyCharm.Community",
+    "JetBrains IntelliJ IDEA": "JetBrains.IntelliJIDEA.Community",
+    "Git": "Git.Git",
+    "Node.js": "OpenJS.NodeJS",
+    "Python": "Python.Python.3.13",
+    "Docker Desktop": "Docker.DockerDesktop",
+    "Postman": "Postman.Postman",
+    "Java JDK": "EclipseAdoptium.Temurin.17.JDK",
+    "Ruby": "RubyInstallerTeam.RubyWithDevKit.3.1",
+    "Go": "GoLang.Go",
+    "MySQL": "Oracle.MySQL",
+    "MongoDB": "MongoDB.Server",
+    "Visual Studio Code": "Microsoft.VisualStudioCode"
+}
