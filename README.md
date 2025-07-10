@@ -7,9 +7,9 @@ Now includes a **Multi Installer** for batch installation of popular apps!
 
 ## 📥 Download & Install  
 1. Go to [WinGUILite's official website download page](https://winguilite.github.io/download).
-2. Choose your prefered WinGUILite edition.
-3. Hit the **Download** button.
-4. **Open the downloaded executable** and start managing packages effortlessly!
+2. Hit the **Download** button.
+3. **Run the installer.**
+4. Open WinGUILite and start managing packages effortlessly!
 
 ## 🛠 Requirements  
 - Windows 10 / 11  
