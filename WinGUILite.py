@@ -12,7 +12,6 @@ all_ids = []
 package_details = {}  # Store raw details per package ID
 
 def run_command(command):
-    """Executes a shell command using PowerShell for winget compatibility."""
     try:
         result = subprocess.run(
             ["powershell", "-Command", command],
@@ -25,7 +24,6 @@ def run_command(command):
         return f"Error executing command: {e}"
 
 def run_command_live(command, output_widget, install_btn, uninstall_btn):
-    """Executes a command and updates output in the Text widget."""
     def task():
         try:
             install_btn.config(state='disabled')
@@ -126,7 +124,6 @@ def on_package_select(event):
     show_detail_screen(name, description, pkg_id)
 
 def fetch_package_details():
-    """Fetches details for all found packages (runs in a separate thread after search)."""
     for programm_id in all_ids:
         package_details[programm_id] = run_command(f"winget show {programm_id}")
 
@@ -172,7 +169,6 @@ def uninstall_package(pkg_id):
     )
 
 def multi_select_mode():
-    # Start the main app in multi-select mode
     base_path = os.path.dirname(os.path.abspath(__file__))
     multi_path = os.path.join(base_path, "Multiple_installer.pyw")
     try:
@@ -181,7 +177,6 @@ def multi_select_mode():
         messagebox.showerror("Error", f"Could not launch Multiple_installer.pyw:\n{e}")
 
 def update_packages_mode():
-    # Launch the Update Manager window
     base_path = os.path.dirname(os.path.abspath(__file__))
     update_path = os.path.join(base_path, "Update-Manager.pyw")
     try:
@@ -189,48 +184,42 @@ def update_packages_mode():
     except Exception as e:
         messagebox.showerror("Error", f"Could not launch Update-Manager.pyw:\n{e}")
 
+def start_main_app():
+    startup_frame.pack_forget()
+    option_frame.pack(fill='x', padx=0, pady=(0, 8))
+    search_frame.pack(fill='both', expand=True)
+
 # --- GUI Setup ---
 root = tk.Tk()
 root.title("WinGUILite")
 root.geometry("780x540")
-root.configure(bg="#f5f6fa")  # Light background for modern look
+root.configure(bg="#f5f6fa")
 
-# Custom fonts
 title_font = font.Font(family='Segoe UI', size=16, weight='bold')
 label_font = font.Font(family='Segoe UI', size=11)
 button_font = font.Font(family='Segoe UI', size=10, weight='bold')
 
-# --- ttk Style Customization for modern look ---
 style = ttk.Style()
 style.theme_use('clam')
-style.configure("Treeview", font=('Segoe UI', 10), rowheight=28, background="#f8f9fa", fieldbackground="#f8f9fa")  # Softer table look
+style.configure("Treeview", font=('Segoe UI', 10), rowheight=28, background="#f8f9fa", fieldbackground="#f8f9fa")
 style.configure("Treeview.Heading", font=('Segoe UI', 11, 'bold'), background="#d1d8e0")
 style.map("Treeview", background=[('selected', '#d6e0f0')])
-style.configure("TButton", font=button_font, padding=6, background="#4078c0", foreground="#fff")  # Blue buttons
+style.configure("TButton", font=button_font, padding=6, background="#4078c0", foreground="#fff")
 style.map("TButton", background=[('active', '#274472')])
 
-# --- Search Frame ---
 search_frame = tk.Frame(root, bg="#f5f6fa")
 search_frame.pack(fill='both', expand=True)
 
 search_header = tk.Frame(search_frame, bg='#4078c0', height=48)
 search_header.pack(fill='x')
-search_title = tk.Label(
-    search_header,
-    text="WinGUILite - A Lite GUI For Microsoft Winget",
-    font=title_font,
-    bg='#4078c0',
-    fg='white'
-)
+search_title = tk.Label(search_header, text="WinGUILite - A Lite GUI For Microsoft Winget", font=title_font, bg='#4078c0', fg='white')
 search_title.pack(side='left', padx=18, pady=8)
 
-# Changed label and button text from Greek to English
 tk.Label(search_frame, text="Search for a package:", font=label_font, bg="#f5f6fa").pack(pady=(18, 0))
 entry_search = ttk.Entry(search_frame, width=44, font=label_font)
 entry_search.pack(pady=7)
 ttk.Button(search_frame, text="Search", command=search_packages).pack(pady=7)
 
-# Changed column names to English
 cols = ("Name", "ID", "Version")
 tree_results = ttk.Treeview(search_frame, columns=cols, show='headings', height=9)
 for c in cols:
@@ -238,11 +227,8 @@ for c in cols:
 tree_results.pack(pady=14, fill='x', padx=18)
 tree_results.bind('<<TreeviewSelect>>', on_package_select)
 
-# --- Detail Frame ---
 detail_frame = tk.Frame(root, bg="#f5f6fa")
-
-# Changed button text to English
-btn_back = ttk.Button(detail_frame, text="⟵ Back", command=back_to_search)
+btn_back = ttk.Button(detail_frame, text="⬅ Back", command=back_to_search)
 btn_back.pack(anchor='nw', padx=18, pady=(18, 0))
 
 label_pkg_name = tk.Label(detail_frame, text="", font=title_font, bg="#f5f6fa", fg="#274472")
@@ -255,87 +241,32 @@ install_btn.pack(side='left', padx=4)
 uninstall_btn = ttk.Button(btns_frame, text="Uninstall")
 uninstall_btn.pack(side='left', padx=4)
 
-# Added border and padding for info box for better appearance
 txt_info = tk.Text(detail_frame, wrap='word', font=('Segoe UI', 10), bg="#f8f9fa", relief='flat', bd=1, highlightthickness=1, highlightbackground="#d1d8e0")
 txt_info.pack(fill='both', expand=True, padx=18, pady=12)
 txt_info.config(state='disabled')
 
-# --- Top Option Frame (NEW) ---
-option_frame = tk.Frame(root, bg="#eaf0fb", bd=1, relief='solid')  # Light blue top frame
+option_frame = tk.Frame(root, bg="#eaf0fb", bd=1, relief='solid')
 option_frame.pack(fill='x', padx=0, pady=(0, 8))
 
-option_label = tk.Label(
-    option_frame,
-    text="Select and download multiple applications together.",
-    font=label_font,
-    bg="#eaf0fb",
-    fg="#274472"
-)
+option_label = tk.Label(option_frame, text="Select and download multiple applications together.", font=label_font, bg="#eaf0fb", fg="#274472")
 option_label.pack(side='left', padx=18, pady=8)
 
-# --- Startup Choice Frame ---
 startup_frame = tk.Frame(root, bg="#eaf0fb", bd=1, relief='solid')
 startup_frame.pack(fill='both', expand=True)
 
-startup_label = tk.Label(
-    startup_frame,
-    text="Please select one of the following options:",
-    font=title_font,
-    bg="#eaf0fb",
-    fg="#274472"
-)
+startup_label = tk.Label(startup_frame, text="Please select one of the following options:", font=title_font, bg="#eaf0fb", fg="#274472")
 startup_label.pack(pady=(60, 30))
 
-btn_multi = ttk.Button(
-    startup_frame,
-    text="Select and download multiple applications together.",
-    style="TButton",
-    command=lambda: multi_select_mode()
-)
+btn_multi = ttk.Button(startup_frame, text="Select and download multiple applications together.", style="TButton", command=multi_select_mode)
 btn_multi.pack(pady=12, ipadx=12, ipady=6)
 
-btn_single = ttk.Button(
-    startup_frame,
-    text="Or search for a specific one",
-    style="TButton",
-    command=lambda: start_main_app()
-)
+btn_single = ttk.Button(startup_frame, text="Or search for a specific one", style="TButton", command=start_main_app)
 btn_single.pack(pady=12, ipadx=12, ipady=6)
 
-btn_update = ttk.Button(
-    startup_frame,
-    text="Update installed applications",
-    style="TButton",
-    command=lambda: update_packages_mode()
-)
+btn_update = ttk.Button(startup_frame, text="Update installed applications", style="TButton", command=update_packages_mode)
 btn_update.pack(pady=12, ipadx=12, ipady=6)
 
-def start_main_app():
-    # Hide the startup frame and show the main app UI
-    startup_frame.pack_forget()
-    option_frame.pack(fill='x', padx=0, pady=(0, 8))
-    search_frame.pack(fill='both', expand=True)
-
-def multi_select_mode():
-    # Start the main app in multi-select mode
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    multi_path = os.path.join(base_path, "Multiple_installer.py")
-    try:
-        subprocess.Popen([sys.executable, multi_path])
-    except Exception as e:
-        messagebox.showerror("Error", f"Could not launch Multiple_installer.py:\n{e}")
-
-# Hide the main UI frames at startup
 option_frame.pack_forget()
 search_frame.pack_forget()
 
 root.mainloop()
-
-# --- Appearance changes summary ---
-# 1. Changed all Greek labels/buttons to English.
-# 2. Changed Treeview column names to English.
-# 3. Added/kept soft background colors and paddings for a modern, clean look.
-# 4. Used ttk widgets and custom fonts for a more professional UI.
-# 5. Added comments to highlight appearance-related changes.
-# 6. Added a top frame with a message and a button for single search.
-# 7. Added a startup frame to choose between single and multiple application selection modes.
