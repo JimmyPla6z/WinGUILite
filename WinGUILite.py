@@ -174,24 +174,24 @@ def uninstall_package(pkg_id):
 def multi_select_mode():
     # Start the main app in multi-select mode
     base_path = os.path.dirname(os.path.abspath(__file__))
-    multi_path = os.path.join(base_path, "Multiple_installer.py")
+    multi_path = os.path.join(base_path, "Multiple_installer.pyw")
     try:
         subprocess.Popen([sys.executable, multi_path])
     except Exception as e:
-        messagebox.showerror("Error", f"Could not launch Multiple_installer.py:\n{e}")
+        messagebox.showerror("Error", f"Could not launch Multiple_installer.pyw:\n{e}")
 
 def update_packages_mode():
     # Launch the Update Manager window
     base_path = os.path.dirname(os.path.abspath(__file__))
-    update_path = os.path.join(base_path, "Update-Manager.py")
+    update_path = os.path.join(base_path, "Update-Manager.pyw")
     try:
         subprocess.Popen([sys.executable, update_path])
     except Exception as e:
-        messagebox.showerror("Error", f"Could not launch Update-Manager.py:\n{e}")
+        messagebox.showerror("Error", f"Could not launch Update-Manager.pyw:\n{e}")
 
 # --- GUI Setup ---
 root = tk.Tk()
-root.title("Wingui Lite")
+root.title("WinGUILite")
 root.geometry("780x540")
 root.configure(bg="#f5f6fa")  # Light background for modern look
 
@@ -217,7 +217,7 @@ search_header = tk.Frame(search_frame, bg='#4078c0', height=48)
 search_header.pack(fill='x')
 search_title = tk.Label(
     search_header,
-    text="Wingui Lite - A Lite GUI For Microsoft Winget",
+    text="WinGUILite - A Lite GUI For Microsoft Winget",
     font=title_font,
     bg='#4078c0',
     fg='white'
