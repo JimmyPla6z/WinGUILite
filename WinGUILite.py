@@ -180,6 +180,15 @@ def multi_select_mode():
     except Exception as e:
         messagebox.showerror("Error", f"Could not launch Multiple_installer.py:\n{e}")
 
+def update_packages_mode():
+    # Launch the Update Manager window
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    update_path = os.path.join(base_path, "Update-Manager.py")
+    try:
+        subprocess.Popen([sys.executable, update_path])
+    except Exception as e:
+        messagebox.showerror("Error", f"Could not launch Update-Manager.py:\n{e}")
+
 # --- GUI Setup ---
 root = tk.Tk()
 root.title("Wingui Lite")
@@ -292,6 +301,14 @@ btn_single = ttk.Button(
     command=lambda: start_main_app()
 )
 btn_single.pack(pady=12, ipadx=12, ipady=6)
+
+btn_update = ttk.Button(
+    startup_frame,
+    text="Update installed applications",
+    style="TButton",
+    command=lambda: update_packages_mode()
+)
+btn_update.pack(pady=12, ipadx=12, ipady=6)
 
 def start_main_app():
     # Hide the startup frame and show the main app UI
