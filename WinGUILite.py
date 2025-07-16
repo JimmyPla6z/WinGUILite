@@ -6,6 +6,280 @@ import threading
 import re
 import os
 import sys
+import json
+
+# --- Multiple Installer Utility (from Multiple_installer.py) ---
+def clear_spaces(name):
+    return name.replace(" ", "_").replace("-", "_").replace(".", "_").replace("/", "_")
+
+class InstallerApp(tk.Toplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("🎈 Multi installer utility (Tkinter) 🎈")
+        self.geometry("700x500")
+        self.resizable(False, False)
+        self.configure(bg="#f5f6fa")
+
+        self.title_font = font.Font(family='Segoe UI', size=16, weight='bold')
+        self.label_font = font.Font(family='Segoe UI', size=11)
+        self.button_font = font.Font(family='Segoe UI', size=10, weight='bold')
+
+        style = ttk.Style(self)
+        style.theme_use('clam')
+        style.configure("TNotebook", background="#f5f6fa", borderwidth=0)
+        style.configure("TNotebook.Tab", font=self.label_font, padding=[16, 8], background="#eaf0fb", foreground="#274472")
+        style.map("TNotebook.Tab", background=[("selected", "#d6e0f0")])
+        style.configure("TFrame", background="#f5f6fa")
+        style.configure("TLabel", background="#f5f6fa", font=self.label_font)
+        style.configure("TButton", font=self.button_font, padding=6, background="#4078c0", foreground="#fff")
+        style.map("TButton", background=[('active', '#274472')])
+        style.configure("TCheckbutton", background="#f5f6fa", font=self.label_font)
+        style.configure("TMenubutton", background="#eaf0fb", font=self.label_font)
+
+        self.categories = {
+            "media": {"label": "Media & Video", "data": {}, "vars": {}},
+            "browsers": {"label": "Web Browsers", "data": {}, "vars": {}},
+            "utilities": {"label": "System Utilities", "data": {}, "vars": {}},
+            "documentation": {"label": "Office + PDF", "data": {}, "vars": {}},
+            "developing": {"label": "Development Tools", "data": {}, "vars": {}},
+        }
+        self.load_packages()
+        self.create_widgets()
+
+    def load_packages(self):
+        base_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+        for cat, info in self.categories.items():
+            json_filename = f"{cat if cat != 'document' else 'documentation'}.json"
+            json_path = os.path.join(base_path, "packages", json_filename)
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    info["data"] = json.load(f)
+            except FileNotFoundError:
+                messagebox.showerror("Error", f"File {json_filename} not found in 'packages' folder.")
+                self.destroy()
+
+    def create_widgets(self):
+        header = tk.Frame(self, bg="#4078c0", height=48)
+        header.pack(fill='x')
+        header_lbl = tk.Label(
+            header,
+            text="Multi installer utility - Select and install multiple applications",
+            font=self.title_font,
+            bg='#4078c0',
+            fg='white'
+        )
+        header_lbl.pack(side='left', padx=18, pady=8)
+
+        self.selected_label = ttk.Label(self, text="🛒 You have selected 0 for installation.", font=self.label_font)
+        self.selected_label.pack(pady=(18, 10))
+
+        menubar = tk.Menu(self)
+        basket_menu = tk.Menu(menubar, tearoff=0)
+        basket_menu.add_command(label="Show Selected", command=self.show_basket_window)
+        basket_menu.add_command(label="Install Selected", command=self.start_install_thread)
+        menubar.add_cascade(label="🛒 Basket", menu=basket_menu)
+        self.config(menu=menubar)
+
+        self.notebook = ttk.Notebook(self)
+        self.frames = {}
+        for cat, info in self.categories.items():
+            frame = ttk.Frame(self.notebook)
+            self.frames[cat] = frame
+            self.notebook.add(frame, text=info["label"])
+            for name in info["data"]:
+                var = tk.BooleanVar()
+                cb = ttk.Checkbutton(frame, text=name, variable=var, command=self.update_selected, style="TCheckbutton")
+                cb.pack(anchor="w", padx=18, pady=4)
+                info["vars"][name] = var
+        self.notebook.pack(expand=True, fill="both", padx=18, pady=10)
+
+        btns_frame = tk.Frame(self, bg="#f5f6fa")
+        btns_frame.pack(pady=(0, 12))
+        self.show_btn = ttk.Button(btns_frame, text="👀 Show Selected", command=self.show_selected)
+        self.show_btn.pack(side='left', padx=8)
+        self.install_btn = ttk.Button(btns_frame, text="🚀 Install Selected", command=self.start_install_thread)
+        self.install_btn.pack(side='left', padx=8)
+
+    def update_selected(self):
+        total = 0
+        for info in self.categories.values():
+            total += sum(var.get() for var in info["vars"].values())
+        self.selected_label.config(text=f"🛒 You have selected {total} for installation.")
+
+    def show_selected(self):
+        selected = []
+        for cat, info in self.categories.items():
+            for name, var in info["vars"].items():
+                if var.get():
+                    selected.append(f"{info['label']}: {name}")
+        if selected:
+            messagebox.showinfo("Selected Applications", "\n".join(selected))
+        else:
+            messagebox.showinfo("Selected Applications", "No applications selected.")
+
+    def show_basket_window(self):
+        selected = []
+        for cat, info in self.categories.items():
+            for name, var in info["vars"].items():
+                if var.get():
+                    selected.append((info['label'], name, cat))
+        win = tk.Toplevel(self)
+        win.title("🛒 Basket - Selected Applications")
+        win.geometry("400x400")
+        win.configure(bg="#f5f6fa")
+        lbl = ttk.Label(win, text="Applications you have selected:", font=self.label_font)
+        lbl.pack(pady=10)
+        listbox = tk.Listbox(win, font=("Segoe UI", 10), bg="#f8f9fa", bd=0, highlightthickness=1, highlightbackground="#d1d8e0")
+        for label, name, _ in selected:
+            listbox.insert(tk.END, f"{label}: {name}")
+        listbox.pack(expand=True, fill="both", padx=10, pady=10)
+        if selected:
+            btn = ttk.Button(win, text="🚀 Install Selected", command=lambda: [win.destroy(), self.start_install_thread()])
+            btn.pack(pady=10)
+        else:
+            lbl2 = ttk.Label(win, text="No applications selected.", foreground="red")
+            lbl2.pack(pady=10)
+
+    def start_install_thread(self):
+        threading.Thread(target=self.install_selected, daemon=True).start()
+
+    def install_selected(self):
+        selected = []
+        for cat, info in self.categories.items():
+            for name, var in info["vars"].items():
+                if var.get():
+                    selected.append((cat, name))
+        if not selected:
+            messagebox.showinfo("Installation", "No applications selected.")
+            return
+        for cat, name in selected:
+            order = self.categories[cat]["data"][name]
+            self.show_status(f"Installing {name}...")
+            subprocess.run(f"winget install -e --id {order} --accept-source-agreements --accept-package-agreements --silent", shell=True)
+        self.show_status("Installation completed!")
+
+    def show_status(self, msg):
+        self.selected_label.config(text=msg)
+        self.update_idletasks()
+
+# --- Update Manager Utility (from Update-Manager.py) ---
+class UpdateManagerApp(tk.Toplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("WinGUILite - Update Manager")
+        self.geometry("600x500")
+        self.resizable(False, False)
+        self.configure(bg="#f5f6fa")
+
+        self.updates = {}  # {name: id}
+        self.vars = {}     # {name: BooleanVar}
+
+        self.create_widgets()
+        threading.Thread(target=self.fetch_updates, daemon=True).start()
+
+    def create_widgets(self):
+        header = tk.Frame(self, bg="#4078c0", height=48)
+        header.pack(fill='x')
+        tk.Label(
+            header,
+            text="Update Manager - Select applications to update",
+            font=("Segoe UI", 16, "bold"),
+            bg="#4078c0",
+            fg="white"
+        ).pack(side='left', padx=18, pady=8)
+
+        self.status_label = ttk.Label(self, text="Searching for available updates...", font=("Segoe UI", 11))
+        self.status_label.pack(pady=(18, 10))
+
+        self.list_frame = tk.Frame(self, bg="#f5f6fa")
+        self.list_frame.pack(expand=True, fill="both", padx=18, pady=10)
+
+        self.checkbuttons = []
+
+        btns_frame = tk.Frame(self, bg="#f5f6fa")
+        btns_frame.pack(pady=12)
+        self.update_btn = ttk.Button(btns_frame, text="Update Selected", command=self.update_selected)
+        self.update_btn.pack(side='left', padx=8)
+        self.update_all_btn = ttk.Button(btns_frame, text="Update All", command=self.update_all)
+        self.update_all_btn.pack(side='left', padx=8)
+
+    def fetch_updates(self):
+        self.status_label.config(text="Searching for available updates...")
+        try:
+            result = subprocess.run(
+                ["winget", "upgrade"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8"
+            )
+            lines = result.stdout.splitlines()
+            start = 0
+            for i, line in enumerate(lines):
+                if line.strip().startswith("Name"):
+                    start = i + 1
+                    break
+            for line in lines[start:]:
+                cols = [c for c in line.strip().split("  ") if c]
+                if len(cols) >= 3:
+                    name = cols[0].strip()
+                    pkg_id = cols[1].strip()
+                    self.updates[name] = pkg_id
+            self.show_updates()
+        except Exception as e:
+            self.status_label.config(text=f"Error fetching updates: {e}")
+
+    def show_updates(self):
+        for widget in self.list_frame.winfo_children():
+            widget.destroy()
+        self.vars.clear()
+        self.checkbuttons.clear()
+        if not self.updates:
+            self.status_label.config(text="No updates available.")
+            return
+        self.status_label.config(text=f"Found {len(self.updates)} updates available.")
+        for name, pkg_id in self.updates.items():
+            var = tk.BooleanVar()
+            cb = ttk.Checkbutton(self.list_frame, text=f"{name} ({pkg_id})", variable=var)
+            cb.pack(anchor="w", padx=8, pady=4)
+            self.vars[name] = var
+            self.checkbuttons.append(cb)
+
+    def update_selected(self):
+        selected = [self.updates[name] for name, var in self.vars.items() if var.get()]
+        if not selected:
+            messagebox.showinfo("Update", "No applications selected for update.")
+            return
+        self.status_label.config(text="Updating selected applications...")
+        threading.Thread(target=self.run_updates, args=(selected,), daemon=True).start()
+
+    def update_all(self):
+        all_ids = list(self.updates.values())
+        if not all_ids:
+            messagebox.showinfo("Update", "No applications available for update.")
+            return
+        self.status_label.config(text="Updating all applications...")
+        threading.Thread(target=self.run_updates, args=(all_ids,), daemon=True).start()
+
+    def run_updates(self, pkg_ids):
+        for pkg_id in pkg_ids:
+            self.status_label.config(text=f"Updating {pkg_id}...")
+            subprocess.run(
+                f'winget upgrade --id {pkg_id} --accept-source-agreements --accept-package-agreements --silent',
+                shell=True
+            )
+        self.status_label.config(text="Update process completed!")
+        messagebox.showinfo("Update", "Selected applications have been updated.")
+
+# --- Main WinGUILite GUI (original code, with launchers updated) ---
+import tkinter as tk
+from tkinter import ttk, messagebox
+from tkinter import font
+import subprocess
+import threading
+import re
+import os
+import sys
+import json
 
 # List to store all package IDs
 all_ids = []
@@ -169,20 +443,10 @@ def uninstall_package(pkg_id):
     )
 
 def multi_select_mode():
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    multi_path = os.path.join(base_path, "Multiple_installer.pyw")
-    try:
-        subprocess.Popen([sys.executable, multi_path])
-    except Exception as e:
-        messagebox.showerror("Error", f"Could not launch Multiple_installer.pyw:\n{e}")
+    InstallerApp(root)
 
 def update_packages_mode():
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    update_path = os.path.join(base_path, "Update-Manager.pyw")
-    try:
-        subprocess.Popen([sys.executable, update_path])
-    except Exception as e:
-        messagebox.showerror("Error", f"Could not launch Update-Manager.pyw:\n{e}")
+    UpdateManagerApp(root)
 
 def start_main_app():
     startup_frame.pack_forget()
