@@ -35,6 +35,4 @@ Now includes a **Multi Installer** for batch installation of popular apps and an
 4. Enjoy easy, fast package management!  
 
 ## 🤝 Contributing  
-Want to help improve **WinGUILite**? Contributions are welcome!  
-For detailed steps on how to contribute to **WinGUILite**, please  
-read the [CONTRIBUTING.md](https://github.com/JimmyPla6z/WinGUILite/blob/main/CONTRIBUTING.md)
+Want to help improve **WinGUILite**? Contributions are welcome! For detailed steps on how to contribute to **WinGUILite**, please read the [CONTRIBUTING.md](https://github.com/JimmyPla6z/WinGUILite/blob/main/CONTRIBUTING.md)
