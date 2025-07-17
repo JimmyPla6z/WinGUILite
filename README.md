@@ -2,7 +2,7 @@
 *A simple GUI for Microsoft WinGet*  
 
 ## 🌟 Overview  
-WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to install, update, and manage packages without using the command line.  Now includes a **Multi Installer** for batch installation of popular apps and an **Update Manager** for updating installed applications!
+WinGUI Lite is a graphical interface for Microsoft WinGet, allowing users to install, update, and manage packages without using the command line.
 
 ## 📥 Download & Install  
 1. Go to [WinGUILite's official website download page](https://winguilite.github.io/download).  
